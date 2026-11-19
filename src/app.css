@@ -1,0 +1,28 @@
+/* Own theme on top of Pico CSS. Keep colours here so contrast (WCAG AA, >= 4.5:1) is checked in one place. */
+:root {
+	--ql-brand: #1d4ed8;
+	--ql-brand-hover: #1e40af;
+	--ql-brand-contrast: #ffffff;
+	--ql-correct: #15803d;
+	--ql-incorrect: #b91c1c;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		--ql-brand: #93c5fd;
+		--ql-brand-hover: #bfdbfe;
+		--ql-brand-contrast: #0f172a;
+		--ql-correct: #4ade80;
+		--ql-incorrect: #f87171;
+	}
+}
+
+:root {
+	--pico-primary: var(--ql-brand);
+	--pico-primary-background: var(--ql-brand);
+	--pico-primary-border: var(--ql-brand);
+	--pico-primary-hover: var(--ql-brand-hover);
+	--pico-primary-hover-background: var(--ql-brand-hover);
+	--pico-primary-hover-border: var(--ql-brand-hover);
+	--pico-primary-inverse: var(--ql-brand-contrast);
+}
