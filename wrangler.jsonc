@@ -13,9 +13,8 @@
 	"d1_databases": [
 		{
 			"binding": "DB",
-			"database_name": "quizlab",
-			// Replace with the id printed by `npx wrangler d1 create quizlab` before the first remote deploy.
-			"database_id": "00000000-0000-0000-0000-000000000000",
+			"database_name": "wdm-database",
+			"database_id": "7a41c89f-52a0-4c09-9f34-9e71cedbc74c",
 			"migrations_dir": "migrations"
 		}
 	],
