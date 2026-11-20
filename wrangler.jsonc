@@ -18,6 +18,12 @@
 			"migrations_dir": "migrations"
 		}
 	],
+	"observability": {
+		"logs": {
+	    	"enabled": false,
+	    	"invocation_logs": true
+		}
+	},
 	"workers_dev": true,
 	"preview_urls": true
 }
