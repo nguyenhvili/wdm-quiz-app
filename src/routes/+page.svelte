@@ -4,5 +4,5 @@
 
 <main class="container">
 	<h1>QuizLab</h1>
-	<p>Create, share and take learning quizzes.</p>
+	<p>Create, share and take learning quizzes. lorem</p>
 </main>
