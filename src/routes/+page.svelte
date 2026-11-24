@@ -2,7 +2,6 @@
 	<title>QuizLab</title>
 </svelte:head>
 
-<main class="container">
-	<h1>QuizLab</h1>
-	<p>Create, share and take learning quizzes. lorem</p>
-</main>
+<h1>QuizLab</h1>
+<p>Create, share and take learning quizzes.</p>
+<p><a href="/new" role="button">+ Create a quiz</a></p>

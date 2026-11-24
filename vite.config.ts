@@ -16,7 +16,9 @@ export default defineConfig({
 				directives: {
 					'default-src': ['self'],
 					'script-src': ['self'],
-					'style-src': ['self'],
+					// The hash allows only the inline style of SvelteKit's screen-reader route announcer
+					// (#svelte-announcer). If a SvelteKit update changes it, app.css still hides the announcer.
+					'style-src': ['self', 'unsafe-hashes', 'sha256-S8qMpvofolR8Mpjy4kQvEm7m1q8clzU4dfDH0AmvZjo='],
 					'img-src': ['self', 'data:'],
 					'font-src': ['self'],
 					'connect-src': ['self'],

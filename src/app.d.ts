@@ -5,13 +5,11 @@ declare global {
 		// interface Error {}
 		// interface Locals {}
 		// interface PageData {}
-		// interface PageState {}
-		interface Platform {
-			env: Env; // generated from wrangler.jsonc by `npm run gen`
-			ctx: ExecutionContext;
-			caches: CacheStorage;
-			cf?: IncomingRequestCfProperties;
+		interface PageState {
+			/** Sub-screen of the quiz editor, kept in history so the back button works. */
+			editorView?: 'tags' | 'question' | 'type' | 'links';
 		}
+		// interface Platform {} – not used: bindings come from `import { env } from 'cloudflare:workers'`
 	}
 }
 

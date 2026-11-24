@@ -1,28 +1,246 @@
-/* Own theme on top of Pico CSS. Keep colours here so contrast (WCAG AA, >= 4.5:1) is checked in one place. */
+/* QuizLab theme on top of Pico CSS: navy + gold.
+   Contrast (WCAG AA): white on navy 10.4:1, navy on white 10.4:1, ink on gold 9.6:1.
+   Gold is only ever a background (with dark text) or a decoration – never text on white (1.9:1).
+   The selectors below repeat Pico's own so that these values win over Pico's defaults. */
+
 :root {
-	--ql-brand: #1d4ed8;
-	--ql-brand-hover: #1e40af;
-	--ql-brand-contrast: #ffffff;
-	--ql-correct: #15803d;
-	--ql-incorrect: #b91c1c;
+	--ql-navy: #1e3a8a;
+	--ql-navy-dark: #172554;
+	--ql-gold: #f5b301;
+	--ql-ink: #0f172a;
+	--ql-header-bg: var(--ql-navy);
+	--ql-header-text: #ffffff;
+	--ql-nav-height: 4rem;
+}
+
+:root:not([data-theme='dark']),
+[data-theme='light'] {
+	--pico-primary: var(--ql-navy);
+	--pico-primary-background: var(--ql-navy);
+	--pico-primary-border: var(--ql-navy);
+	--pico-primary-underline: rgba(30, 58, 138, 0.5);
+	--pico-primary-hover: var(--ql-navy-dark);
+	--pico-primary-hover-background: var(--ql-navy-dark);
+	--pico-primary-hover-border: var(--ql-navy-dark);
+	--pico-primary-hover-underline: var(--ql-navy-dark);
+	--pico-primary-focus: rgba(30, 58, 138, 0.35);
+	--pico-primary-inverse: #ffffff;
+	--ql-focus: var(--ql-navy);
+	--ql-surface: #f1f5f9;
+	--ql-danger: #b91c1c;
+	--ql-on-danger: #ffffff;
+	--ql-selected-bg: #fef3c7;
 }
 
 @media (prefers-color-scheme: dark) {
-	:root:not([data-theme='light']) {
-		--ql-brand: #93c5fd;
-		--ql-brand-hover: #bfdbfe;
-		--ql-brand-contrast: #0f172a;
-		--ql-correct: #4ade80;
-		--ql-incorrect: #f87171;
+	:root:not([data-theme]) {
+		--pico-primary: #93c5fd;
+		--pico-primary-background: #93c5fd;
+		--pico-primary-border: #93c5fd;
+		--pico-primary-underline: rgba(147, 197, 253, 0.5);
+		--pico-primary-hover: #bfdbfe;
+		--pico-primary-hover-background: #bfdbfe;
+		--pico-primary-hover-border: #bfdbfe;
+		--pico-primary-hover-underline: #bfdbfe;
+		--pico-primary-focus: rgba(147, 197, 253, 0.35);
+		--pico-primary-inverse: var(--ql-ink);
+		--ql-focus: var(--ql-gold);
+		--ql-surface: #1c212c;
+		--ql-danger: #fca5a5;
+		--ql-on-danger: var(--ql-ink);
+		--ql-selected-bg: #3a2f0b;
 	}
 }
 
-:root {
-	--pico-primary: var(--ql-brand);
-	--pico-primary-background: var(--ql-brand);
-	--pico-primary-border: var(--ql-brand);
-	--pico-primary-hover: var(--ql-brand-hover);
-	--pico-primary-hover-background: var(--ql-brand-hover);
-	--pico-primary-hover-border: var(--ql-brand-hover);
-	--pico-primary-inverse: var(--ql-brand-contrast);
+[data-theme='dark'] {
+	--pico-primary: #93c5fd;
+	--pico-primary-background: #93c5fd;
+	--pico-primary-border: #93c5fd;
+	--pico-primary-underline: rgba(147, 197, 253, 0.5);
+	--pico-primary-hover: #bfdbfe;
+	--pico-primary-hover-background: #bfdbfe;
+	--pico-primary-hover-border: #bfdbfe;
+	--pico-primary-hover-underline: #bfdbfe;
+	--pico-primary-focus: rgba(147, 197, 253, 0.35);
+	--pico-primary-inverse: var(--ql-ink);
+	--ql-focus: var(--ql-gold);
+	--ql-surface: #1c212c;
+	--ql-danger: #fca5a5;
+	--ql-on-danger: var(--ql-ink);
+	--ql-selected-bg: #3a2f0b;
+}
+
+.app-root {
+	display: contents;
+}
+
+/* Visible focus for keyboard users, on top of Pico's own focus styles. */
+:where(a, button, input, select, textarea, summary, [tabindex]:not([tabindex='-1'])):focus-visible {
+	outline: 3px solid var(--ql-focus);
+	outline-offset: 2px;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* SvelteKit's route announcer, in case its inline style is ever blocked by the CSP. */
+#svelte-announcer {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+.skip-link {
+	position: absolute;
+	left: 0.5rem;
+	top: -3rem;
+	z-index: 20;
+	padding: 0.5rem 1rem;
+	background: var(--ql-gold);
+	color: var(--ql-ink);
+	border-radius: var(--pico-border-radius);
+}
+
+.skip-link:focus {
+	top: 0.5rem;
+}
+
+/* Logo: gold tile with a navy "Q". */
+.logo-mark {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	border-radius: 0.45rem;
+	background: var(--ql-gold);
+	color: var(--ql-navy);
+	font-weight: 800;
+	font-size: 1.15rem;
+	line-height: 1;
+}
+
+/* Small pill used for tags and the question type. */
+.chip {
+	display: inline-block;
+	padding: 0.15rem 0.7rem;
+	border: 1px solid var(--pico-muted-border-color);
+	border-radius: 999px;
+	font-size: 0.875rem;
+}
+
+.chip-selected {
+	background: var(--ql-selected-bg);
+	border-color: var(--ql-gold);
+}
+
+.chip-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	margin: 0 0 0.75rem;
+	padding: 0;
+	list-style: none;
+}
+
+.chip-list li {
+	list-style: none;
+	margin: 0;
+}
+
+/* Error summary shown before saving. */
+.error-summary {
+	border: 2px solid var(--ql-danger);
+	border-radius: var(--pico-border-radius);
+	padding: 0.75rem 1rem;
+	margin-bottom: var(--pico-spacing);
+}
+
+.error-summary p {
+	margin-bottom: 0.25rem;
+	font-weight: 600;
+	color: var(--ql-danger);
+}
+
+.error-summary ul {
+	margin-bottom: 0;
+}
+
+/* Dashed notice box (empty states, private edit link). */
+.notice {
+	border: 2px dashed var(--pico-muted-border-color);
+	border-radius: var(--pico-border-radius);
+	padding: 1rem;
+	margin-bottom: var(--pico-spacing);
+}
+
+.notice > :last-child {
+	margin-bottom: 0;
+}
+
+/* Button that looks like a link. */
+button.link-button {
+	padding: 0;
+	margin: 0;
+	width: auto;
+	border: 0;
+	background: none;
+	color: var(--pico-primary);
+	text-decoration: underline;
+	font-size: inherit;
+}
+
+button.link-button:hover {
+	color: var(--pico-primary-hover);
+}
+
+.full-width {
+	width: 100%;
+}
+
+/* Large selectable row with a checkbox or radio (tag picker, question type). */
+.choice-list {
+	padding: 0;
+	margin: 0 0 1rem;
+}
+
+.choice-list li {
+	list-style: none;
+	margin: 0 0 0.5rem;
+}
+
+.choice {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	padding: 0.75rem 1rem;
+	border: 1px solid var(--pico-form-element-border-color);
+	border-radius: var(--pico-border-radius);
+	cursor: pointer;
+}
+
+.choice.selected {
+	border: 2px solid var(--pico-primary);
+	background: var(--ql-selected-bg);
+	font-weight: 600;
+}
+
+.choice input {
+	margin: 0;
+}
+
+.muted {
+	color: var(--pico-muted-color);
 }

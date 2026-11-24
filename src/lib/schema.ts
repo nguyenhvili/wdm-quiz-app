@@ -1,20 +1,10 @@
 // zod schemas for validating request bodies on the server. Must stay in sync with ./types.ts.
 import { z } from 'zod';
+import { LIMITS } from './limits';
 import type { Question, QuizInput } from './types';
 
-export const LIMITS = {
-	title: 200,
-	description: 2000,
-	tags: 10,
-	tag: 30,
-	questions: 200,
-	text: 2000,
-	explanation: 2000,
-	options: 10,
-	pairs: 10,
-	items: 10,
-	id: 64
-} as const;
+export { LIMITS };
+
 
 const id = z.string().trim().min(1).max(LIMITS.id);
 const text = z.string().trim().min(1).max(LIMITS.text);
