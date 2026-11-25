@@ -1,8 +1,14 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
+import type { SystemErrorInfo } from '#lib/systemError.js';
+
 declare global {
 	namespace App {
-		// interface Error {}
+		interface Error {
+			message: string;
+			/** Set for unexpected failures (see src/hooks.server.ts). */
+			system?: SystemErrorInfo;
+		}
 		// interface Locals {}
 		// interface PageData {}
 		interface PageState {

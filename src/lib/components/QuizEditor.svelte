@@ -9,6 +9,7 @@
 	import { page } from '$app/state';
 	import Breadcrumbs from './Breadcrumbs.svelte';
 	import ConfirmDialog from './ConfirmDialog.svelte';
+	import SystemErrorDialog from './SystemErrorDialog.svelte';
 	import QuestionForm from './QuestionForm.svelte';
 	import QuizLinks from './QuizLinks.svelte';
 	import TagPicker from './TagPicker.svelte';
@@ -25,7 +26,9 @@
 		type EditableType
 	} from '#lib/editor.js';
 	import { LIMITS } from '#lib/limits.js';
+	import { api } from '#lib/api.js';
 	import { myQuizzes } from '#lib/storage.js';
+	import type { SystemErrorInfo } from '#lib/systemError.js';
 	import type { CreatedQuiz, QuizInput } from '#lib/types.js';
 
 	type Props = {
@@ -48,6 +51,8 @@
 	// Validation errors update live once shown, so fixed problems disappear from the list.
 	let validated = $state(false);
 	let serverError = $state('');
+	let systemError = $state<SystemErrorInfo | null>(null);
+	let systemAction = $state('save the quiz');
 	const errors = $derived([...(validated ? validateQuiz(quiz) : []), ...(serverError ? [serverError] : [])]);
 	let status = $state('');
 	let saving = $state(false);
@@ -160,14 +165,15 @@
 		errorBox?.focus();
 	}
 
-	async function errorMessage(res: Response): Promise<string> {
-		if (res.status === 401) return 'This edit link is no longer valid, so the changes could not be saved.';
-		const body = (await res.json().catch(() => null)) as { error?: string } | null;
-		return body?.error ? `The quiz could not be saved: ${body.error}` : 'The quiz could not be saved. Try again.';
-	}
-
 	function authHeaders(): Record<string, string> {
 		return existing ? { authorization: `Bearer ${existing.editToken}` } : {};
+	}
+
+	/** Problems the user can fix go to the error summary; everything else opens the system error dialog. */
+	function userMessage(status: number, error: string, action: string): string {
+		if (status === 401) return `This edit link is no longer valid, so the quiz could not be ${action}.`;
+		if (status === 404) return `This quiz no longer exists, so it could not be ${action}.`;
+		return `The quiz could not be ${action}: ${error}`;
 	}
 
 	async function save(e: SubmitEvent) {
@@ -179,12 +185,17 @@
 
 		saving = true;
 		try {
-			const res = await fetch(existing ? `/api/quizzes/${existing.id}` : '/api/quizzes', {
+			const res = await api<CreatedQuiz>(existing ? `/api/quizzes/${existing.id}` : '/api/quizzes', {
 				method: existing ? 'PUT' : 'POST',
 				headers: { 'content-type': 'application/json', ...authHeaders() },
 				body: JSON.stringify(quiz)
 			});
-			if (!res.ok) return showErrors(await errorMessage(res));
+			if ('systemError' in res) {
+				systemAction = 'save the quiz';
+				systemError = res.systemError;
+				return;
+			}
+			if ('userError' in res) return showErrors(userMessage(res.status, res.userError, 'saved'));
 			savedSnapshot = JSON.stringify(quiz);
 
 			if (existing) {
@@ -193,13 +204,11 @@
 				return;
 			}
 			// New quiz: continue on its edit page and show the links.
-			const created = (await res.json()) as CreatedQuiz;
+			const created = res.data;
 			myQuizzes.save({ id: created.id, title: quiz.title.trim(), editToken: created.editToken });
 			const editUrl = `/q/${created.id}/edit?key=${encodeURIComponent(created.editToken)}`;
 			await goto(editUrl, { replace: true });
 			await goto(editUrl, { shallow: true, state: { editorView: 'links' } });
-		} catch {
-			showErrors("Couldn't reach the server. Check your connection and try again.");
 		} finally {
 			saving = false;
 		}
@@ -207,19 +216,16 @@
 
 	async function deleteQuiz() {
 		if (!existing) return;
-		try {
-			const res = await fetch(`/api/quizzes/${existing.id}`, { method: 'DELETE', headers: authHeaders() });
-			if (!res.ok && res.status !== 404) {
-				return showErrors(
-					res.status === 401 ? 'This edit link is no longer valid.' : 'The quiz could not be deleted. Try again.'
-				);
-			}
-			myQuizzes.remove(existing.id);
-			savedSnapshot = JSON.stringify(quiz);
-			await goto('/my');
-		} catch {
-			showErrors("Couldn't reach the server. Check your connection and try again.");
+		const res = await api<void>(`/api/quizzes/${existing.id}`, { method: 'DELETE', headers: authHeaders() });
+		if ('systemError' in res) {
+			systemAction = 'delete the quiz';
+			systemError = res.systemError;
+			return;
 		}
+		if ('userError' in res && res.status !== 404) return showErrors(userMessage(res.status, res.userError, 'deleted'));
+		myQuizzes.remove(existing.id);
+		savedSnapshot = JSON.stringify(quiz);
+		await goto('/my');
 	}
 
 	// Warn before leaving the page with unsaved changes (moving between sub-screens is fine).
@@ -424,6 +430,7 @@
 	confirmLabel="Delete quiz"
 	onconfirm={deleteQuiz}
 />
+<SystemErrorDialog bind:error={systemError} action={systemAction} />
 
 <style>
 	.view-header {

@@ -2,9 +2,20 @@
 import { env } from 'cloudflare:workers';
 import { CODE_ALPHABET, CODE_LENGTH } from '#lib/quizCode.js';
 import type { CreatedQuiz, Quiz, QuizInput, Visibility } from '#lib/types.js';
+import { SystemFault } from './errors';
 
 /** The D1 binding `DB` (from wrangler.jsonc; emulated locally by `vite dev`). */
-export const getDb = (): D1Database => env.DB;
+export function getDb(): D1Database {
+	if (!env.DB) {
+		throw new SystemFault(
+			'Database',
+			'DB_NOT_CONNECTED',
+			'The app is not connected to its database.',
+			'The database binding is missing from the worker configuration, so the database cannot be reached.'
+		);
+	}
+	return env.DB;
+}
 
 function newQuizId(): string {
 	// Rejection sampling keeps every character equally likely (31 * 8 = 248 < 256).
