@@ -15,21 +15,20 @@
 	import TagPicker from './TagPicker.svelte';
 	import {
 		changeType,
-		EDITABLE_TYPES,
 		fromDraft,
-		isEditable,
+		QUESTION_TYPES,
 		questionSummary,
 		toDraft,
+		TYPE_HINTS,
 		TYPE_LABELS,
 		validateQuiz,
-		type DraftQuestion,
-		type EditableType
+		type DraftQuestion
 	} from '#lib/editor.js';
 	import { LIMITS } from '#lib/limits.js';
 	import { api } from '#lib/api.js';
 	import { myQuizzes } from '#lib/storage.js';
 	import type { SystemErrorInfo } from '#lib/systemError.js';
-	import type { CreatedQuiz, QuizInput } from '#lib/types.js';
+	import type { CreatedQuiz, QuestionType, QuizInput } from '#lib/types.js';
 
 	type Props = {
 		/** Quiz to edit; omitted when creating a new one. */
@@ -46,7 +45,7 @@
 
 	let draft = $state<DraftQuestion | null>(null);
 	let draftIndex = $state<number | null>(null);
-	let pendingType = $state<EditableType>('single');
+	let pendingType = $state<QuestionType>('single');
 
 	// Validation errors update live once shown, so fixed problems disappear from the list.
 	let validated = $state(false);
@@ -112,9 +111,7 @@
 	}
 
 	function editQuestion(i: number) {
-		const q = quiz.questions[i];
-		if (!isEditable(q)) return;
-		draft = toDraft(q);
+		draft = toDraft(quiz.questions[i]);
 		draftIndex = i;
 		open('question');
 	}
@@ -268,11 +265,21 @@
 	<fieldset>
 		<legend>Question type</legend>
 		<ul class="choice-list">
-			{#each EDITABLE_TYPES as type (type)}
+			{#each QUESTION_TYPES as type (type)}
 				<li>
 					<label class="choice" class:selected={pendingType === type}>
-						<input type="radio" name="question-type" value={type} bind:group={pendingType} />
-						{TYPE_LABELS[type]}
+						<input
+							type="radio"
+							name="question-type"
+							value={type}
+							bind:group={pendingType}
+							aria-labelledby="type-name-{type}"
+							aria-describedby="type-hint-{type}"
+						/>
+						<span>
+							<span id="type-name-{type}">{TYPE_LABELS[type]}</span>
+							<small id="type-hint-{type}" class="type-hint">{TYPE_HINTS[type]}</small>
+						</span>
 					</label>
 				</li>
 			{/each}
@@ -354,7 +361,6 @@
 								type="button"
 								class="question-card"
 								onclick={() => editQuestion(i)}
-								disabled={!isEditable(question)}
 							>
 								<span class="question-text"><span class="visually-hidden">Edit question </span>{i + 1}. {question.text}</span>
 								<span class="question-meta">{questionSummary(question)}</span>
@@ -433,6 +439,12 @@
 <SystemErrorDialog bind:error={systemError} action={systemAction} />
 
 <style>
+	.type-hint {
+		display: block;
+		font-weight: 400;
+		color: var(--pico-muted-color);
+	}
+
 	.view-header {
 		display: flex;
 		align-items: center;

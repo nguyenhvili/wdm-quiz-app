@@ -221,10 +221,13 @@ button.link-button:hover {
 	margin: 0 0 0.5rem;
 }
 
+label.choice,
 .choice {
 	display: flex;
 	align-items: center;
 	gap: 0.6rem;
+	/* Pico sizes labels that contain a radio/checkbox to their text; these rows are full width. */
+	width: 100%;
 	padding: 0.75rem 1rem;
 	border: 1px solid var(--pico-form-element-border-color);
 	border-radius: var(--pico-border-radius);

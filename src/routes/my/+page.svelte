@@ -34,14 +34,14 @@
 		{#each quizzes as quiz (quiz.id)}
 			<li>
 				<article>
-					<h2>{quiz.title}</h2>
+					<h2><a href="/q/{quiz.id}">{quiz.title}</a></h2>
 					<p class="muted">Quiz code {formatQuizCode(quiz.id)}</p>
 					<div class="actions">
 						<a href="/q/{quiz.id}/edit?key={encodeURIComponent(quiz.editToken)}" role="button">
 							Edit <span class="visually-hidden">“{quiz.title}”</span>
 						</a>
-						<a href="/q/{quiz.id}" role="button" class="secondary outline">
-							Open <span class="visually-hidden">“{quiz.title}”</span>
+						<a href="/q/{quiz.id}/play" role="button" class="secondary outline">
+							Take quiz <span class="visually-hidden">“{quiz.title}”</span>
 						</a>
 					</div>
 				</article>

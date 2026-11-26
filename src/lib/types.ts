@@ -52,3 +52,9 @@ export type MyQuiz = { id: string; title: string; editToken: string };
 
 /** Entry of "Recently taken" in localStorage. `score` is a fraction 0–1. */
 export type TakenQuiz = { id: string; title: string; date: string; score: number };
+
+/** Entry of "Favourites" in localStorage. */
+export type FavouriteQuiz = { id: string; title: string };
+
+/** Entry of "Shared with you" in localStorage: a quiz opened through a shared link. `date` = last opened. */
+export type SharedQuiz = { id: string; title: string; date: string };
